@@ -10,8 +10,19 @@ body, html {
     position: fixed;
 }
 
-h1 {
+h1, h3, h5 {
     font-family: 'Corben', cursive;
-    font-size: 150px;
     text-align: center;
+}
+
+h1 {
+    font-size: 150px;
+}
+
+h3 {
+    font-size: 60px;
+}
+
+h5 {
+    font-size: 35px;
 }
