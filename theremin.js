@@ -20,8 +20,8 @@ $(document).ready(function() {
   gain1.connect(gainTot);
   gain2.connect(gainTot);
   gainTot.connect(context.destination);
-  osc1.start();
-  osc2.start();
+  //osc1.start();
+  //osc2.start();
 
   var changeGain = function(gainNode, value){
     gainNode.gain.value = Math.max(0, Math.min(1, value));
@@ -31,7 +31,7 @@ $(document).ready(function() {
     oscillator.frequency.value = value;
   }
 
-  var theremin = document.getElementById("theremin");
+  var theremin = document.getElementById("visuals");
   $(theremin).mousemove(function(event){
     var h = this.clientHeight;
     var w = this.clientWidth;

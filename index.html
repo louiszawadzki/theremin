@@ -2,17 +2,37 @@
 <html>
     <head>
         <title>Theremin</title>
-        <link href='https://fonts.googleapis.com/css?family=Corben:700' rel='stylesheet' type='text/css'>        <link href="style.css" rel="stylesheet"></link>
+        <link href='https://fonts.googleapis.com/css?family=Corben:700' rel='stylesheet' type='text/css'>
+        <link href="style.css" rel="stylesheet"></link>
         <script src="bower_components/jquery/dist/jquery.js"></script>
     </head>
     <body>
+        <canvas id="visuals" width="500" height="500"></canvas>
         <div id="theremin">
-            <h1>theremin</h1>
-            <br/>
-            <h3>move your mouse to change the pitch</h3>
-            <h5>scroll vertically to change the volume</h5>
-            <h5>scroll horizontally to add tremolo</h5>
         </div>
+
+        <script id="shader-fs" type="x-shader/x-fragment">
+            precision mediump float;
+            varying vec4 vColor;
+            void main(void) {
+                gl_FragColor = vColor;
+            }
+        </script>
+
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexPosition;
+            attribute vec4 aVertexColor;
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+            varying vec4 vColor;
+            void main(void) {
+                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                vColor = aVertexColor;
+            }
+        </script>
+        <script type="text/javascript" src="webgl-utils.js"></script>
+        <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
         <script src="theremin.js"></script>
+        <script src="visuals.js"></script>
     </body>
 </html>
