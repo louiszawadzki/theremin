@@ -1,4 +1,3 @@
-var gl;
 function initGL(canvas) {
     try {
         gl = canvas.getContext("experimental-webgl");
@@ -207,12 +206,14 @@ function initBuffers() {
 }
 var rPyramid = 0;
 var rCubeX = 0;
+var luminosity = 1;
+var color = 1;
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
     mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, [0.0, 0.0, -8.0]);
+    mat4.translate(mvMatrix, [0.0, 0.0, -6.0]);
     /*mvPushMatrix();
     mat4.rotate(mvMatrix, degToRad(rPyramid), [0, 1, 0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
@@ -233,14 +234,27 @@ function drawScene() {
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     mvPopMatrix();
+    gl.clearColor(0.5*color, 0.05, 0.5- 0.5*color, (0.5 + 0.5*color)*luminosity);
 }
 var lastTime = 0;
-var rX = 50;
+rX = 25;
+var lfo = 0;
+function setBackgroundPulse(frequency){
+  lfo = frequency*Math.PI;
+}
+function setBackgroundColor(newColor){
+  color = newColor;
+}
 function animate() {
     var timeNow = new Date().getTime();
+    if (lfo != 0) {
+      var timeInSec = timeNow/1000;
+      luminosity = 0.95+ 0.05*Math.sin(timeInSec*lfo);
+    } else if (luminosity != 1) {
+      luminosity = 1;
+    }
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
-        rPyramid += (90 * elapsed) / 1000.0;
         rCubeX -= (rX * elapsed) / 1000.0;
     }
     lastTime = timeNow;
@@ -250,27 +264,22 @@ function tick() {
     drawScene();
     animate();
 }
+function resizeCanvas(canvas) {
+  canvas.width = document.body.clientWidth-5;
+  canvas.height = document.body.clientHeight-5;
+  gl.viewportWidth = canvas.width;
+  gl.viewportHeight = canvas.height;
+}
 function webGLStart() {
     var canvas = document.getElementById("visuals");
     initGL(canvas);
+    resizeCanvas(canvas);
+    $(window).resize(function() {
+      resizeCanvas(canvas);
+    })
     initShaders()
     initBuffers();
-    gl.clearColor(0.0, 1.0, 0.0, 1.0);
+    gl.clearColor(0.5, 0.05, 0, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    $(canvas).mousemove(function(event){
-        var h = this.clientHeight;
-        var w = this.clientWidth;
-        var y = event.clientY;
-        var x = event.clientX;
-        rX = 50 + (x/2);
-        var color = Math.sqrt(y/h)
-        gl.clearColor(0.5*color, 0.05, 0.5- 0.5*color, 0.5 + 0.5*color);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(setColors(color)), gl.STATIC_DRAW);
-    })
     tick();
 }
-
-
-$(document).ready(function(){
-   webGLStart();
-});
